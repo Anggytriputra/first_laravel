@@ -15,11 +15,20 @@ class DashboardPostController extends Controller
      */
     public function index()
     {
-        // return Products::all();
+
+        // dd(request('search'));
+
+        $products = Products::latest();
+
+        if(request('search')) {
+            $products->where('nama', 'like', '%' . request('search') . '%');
+        }
+
+        $products = $products->paginate(6); // Menggunakan paginate() untuk mendapatkan hasil paginasi
+
         return view('dashboard.index', [
             'title'=> 'Dashboard',
-            'products' => Products::all()
-
+            'products' => $products
         ]);
     }
 
@@ -73,6 +82,8 @@ class DashboardPostController extends Controller
      */
     public function edit($id)
     {
+
+        // dd(request);
         $product = Products::find($id);
 
     if (!$product) {
@@ -91,7 +102,6 @@ class DashboardPostController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         // dd($request);
 
         // dd($id);
@@ -112,8 +122,8 @@ class DashboardPostController extends Controller
             'inputImage' => 'image|mimes:jpeg,png|max:100'
         ]);
 
-        if($request->file('image')){
-            $validateData['image+_url'] = $request->file('image_url')->store('product-images');
+        if($request->file('inputImage')){
+            $validateData['image_url'] = $request->file('inputImage')->store('product-images');
         }
 
         // Perbarui produk dengan data yang telah divalidasi
